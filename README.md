@@ -5,11 +5,11 @@ A secure directory encryption CLI tool written in Go. Cloak encrypts entire dire
 ## Features
 
 - **AES-256-GCM encryption** - Authenticated encryption for confidentiality and integrity
-- **Argon2id key derivation** - Memory-hard password hashing following OWASP recommendations
 - **Secure memory handling** - Sensitive data is wiped from memory after use
 - **Directory compression** - Directories are compressed with gzip before encryption
 - **Path traversal protection** - Prevents zip-slip and similar archive extraction attacks
 - **Cross-platform** - Works on Linux, macOS, and Windows
+- **Interactive mode** - Tab completion for commands and file paths (beta)
 
 ## Installation
 
@@ -46,6 +46,29 @@ cloak decrypt ./my_folder.cloak
 
 This extracts the original directory structure to the current location.
 
+### Interactive mode
+
+```bash
+cloak -i
+```
+
+Starts an interactive shell with autocompletion:
+
+```
+Cloak Interactive Mode
+Type 'help' for commands, Tab for autocomplete, Ctrl+D to exit
+
+cloak> encrypt ./my_  [Tab]
+         my_folder/     Directory
+         my_docs/       Directory
+```
+
+Features:
+- Tab completion for commands (`encrypt`, `decrypt`, `help`, `exit`)
+- Smart file path suggestions (directories for encrypt, `.cloak` files for decrypt)
+- Arrow keys to navigate suggestions
+- Command history
+
 ## File Format
 
 Cloak files (`.cloak`) use the following format:
@@ -58,61 +81,6 @@ Cloak files (`.cloak`) use the following format:
 | Size | 8 bytes | Ciphertext size (big-endian) |
 | Ciphertext | Variable | Encrypted tar.gz archive with auth tag |
 
-## Security
-
-### Cryptographic choices
-
-- **Encryption**: AES-256-GCM (authenticated encryption)
-- **Key derivation**: Argon2id with OWASP-recommended parameters
-  - Time: 3 iterations
-  - Memory: 64 MB
-  - Parallelism: 4 threads
-- **Random generation**: `crypto/rand` (cryptographically secure)
-
-### Security practices
-
-- Passwords are compared using constant-time comparison
-- Sensitive data (passwords, keys) is zeroed after use
-- Archive extraction validates paths to prevent traversal attacks
-
-## Development
-
-### Prerequisites
-
-- Go 1.21 or later
-
-### Make targets
-
-```bash
-make build          # Build the binary
-make test           # Run tests
-make test-verbose   # Run tests with verbose output
-make test-coverage  # Generate coverage report
-make lint           # Run golangci-lint
-make fmt            # Format code
-make vet            # Run go vet
-make tidy           # Tidy go modules
-make clean          # Remove build artifacts
-make all            # Run fmt, vet, test, and build
-make help           # Show available targets
-```
-
-### Project structure
-
-```
-cloak/
-├── cmd/
-│   └── cloak/
-│       └── main.go         # CLI entry point
-├── internal/
-│   └── cloak/
-│       ├── cloak.go        # Core encryption logic
-│       └── cloak_test.go   # Tests
-├── Makefile
-├── go.mod
-├── go.sum
-└── README.md
-```
 
 ## License
 
